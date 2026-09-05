@@ -81,8 +81,6 @@ tracking, DM-branch handling, multi-resume selection.
 - **ADR-004** Skills layer wraps a deterministic engine (this RFC's core).
 - **ADR-005** Own-session Playwright for read-side; Apify-style API is the
   documented fallback, not the default.
-- **ADR-006** Hermes Agent evaluated; deferred to v2 (portability preserved by
-  ADR-004's skill format choice).
 
 ## 6. Alternatives considered
 
@@ -93,7 +91,6 @@ tracking, DM-branch handling, multi-resume selection.
 | Apify actors for read-side (reference repo's approach) | $ per read, still ToS-adjacent, adds a third party holding our query patterns. **But**: zero own-account risk. Escape hatch: if guardrail trips twice (PRD §8), we revisit with an `ApifySource` behind the same `RawPost` contract |
 | Publora-style publishing API | Publishes *posts*; we send *emails*. Not our funnel |
 | MCP server instead of skills | Heavier to build/maintain for one user; skills are files in the repo, reviewable in PRs like everything else |
-| Hermes Agent (Nous Research) as the runtime | MIT, free, agentskills.io-compatible — but built for autonomy (cron, unattended delivery) against a project whose core guardrails are human presence and no auto-send; replaces none of our engine. Deferred to v2 for mobile review / scheduled processing / outcome memory — see **ADR-006** |
 
 ## 7. Impact on the spike
 
