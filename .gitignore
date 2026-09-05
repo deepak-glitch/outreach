@@ -1,0 +1,21 @@
+# Virtualenv
+.venv/
+
+# Live LinkedIn browser session — treat as a credential, never commit
+.userdata/
+
+# OAuth tokens, API keys
+.secrets/
+
+# Runtime data
+data/
+logs/
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Personal documents (keep out of git; config/resume.example.txt is the committed template)
+config/resume.txt
+config/resume.pdf

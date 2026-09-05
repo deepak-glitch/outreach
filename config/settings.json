@@ -1,0 +1,15 @@
+{
+  "discover": {
+    "max_posts_per_run": 25,
+    "max_run_minutes": 20,
+    "max_idle_scrolls": 4,
+    "delays": {
+      "min_seconds": 4.0,
+      "max_seconds": 11.0
+    }
+  },
+  "llm": {
+    "cheap_model": "claude-haiku-4-5",
+    "draft_model": "claude-opus-5"
+  }
+}

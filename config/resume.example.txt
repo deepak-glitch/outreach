@@ -1,0 +1,17 @@
+YOUR NAME
+City, Country · you@example.com · linkedin.com/in/you
+
+SUMMARY
+Two lines on who you are and what you build.
+
+EXPERIENCE
+Company — Title (2023–present)
+- Bullet with a concrete, verifiable accomplishment.
+- Another bullet. Only claims you can defend in an interview.
+
+SKILLS
+Python, PyTorch, ... (only skills you actually have — this file is the drafter's
+ONLY source of truth; anything missing here can never appear in an email)
+
+EDUCATION
+Degree, School, Year

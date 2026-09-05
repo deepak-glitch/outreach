@@ -1,0 +1,23 @@
+{
+  "target_role_description": "AI/ML engineering roles building or deploying LLM-powered or machine-learning systems. Not: pure data-analyst, sales-engineering, or ML-adjacent marketing roles.",
+  "work_auth": {
+    "reject_phrases": [
+      "no sponsorship",
+      "sponsorship not available",
+      "cannot sponsor",
+      "unable to sponsor",
+      "no visa sponsorship",
+      "must be authorized to work without sponsorship",
+      "US citizens only",
+      "citizens only",
+      "no C2C",
+      "no OPT",
+      "no CPT"
+    ]
+  },
+  "employment_types_allowed": ["full-time", "contract"],
+  "location": {
+    "remote_required": false,
+    "allowed_locations": []
+  }
+}
