@@ -16,8 +16,8 @@ artifact and gates on product-owner (you) sign-off before the next stage starts.
 | # | Stage | Artifact | Gate | Status |
 |---|---|---|---|---|
 | 1 | Kickoff + brainstorm | `01-kickoff-brainstorm.md` | PO reviews notes | ✅ done |
-| 2 | Product requirements | `02-prd.md` | PO signs off PRD | 🔶 in review |
-| 3 | Architecture whiteboard + RFC | `03-rfc-architecture.md` + `adr/` | RFC approved | ⬜ |
+| 2 | Product requirements | `02-prd.md` (v0.2: + skills interface) | PO signs off PRD | 🔶 in review |
+| 3 | Architecture whiteboard + RFC | `03-rfc-architecture.md` + `adr/ADR-001…005` | RFC approved | 🔶 in review |
 | 4 | Sprint planning | `04-sprint-plan.md` (epics → tickets) | Backlog accepted | ⬜ |
 | 5 | Implementation | One PR per ticket, code-reviewed | CI green + review | ⬜ |
 | 6 | Test plan + hardening | `05-test-plan.md`, real-data audit | Exit criteria met | ⬜ |

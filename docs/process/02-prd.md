@@ -1,7 +1,9 @@
 # PRD — Job-post outreach pipeline v1
 
 **Status:** in review · **Owner:** Deepak · **Author:** Claude (tech lead)
-**Doc history:** v0.1 2026-09-05 first draft from kickoff decisions
+**Doc history:** v0.1 2026-09-05 first draft from kickoff decisions ·
+v0.2 2026-09-05 PO direction: expose the pipeline as Claude Code skills
+(reference: sergebulaev/linkedin-skills) — added F12, updated G5
 
 ## 1. Background & problem
 
@@ -18,6 +20,9 @@ the highest-signal channel; working them manually is slow and inconsistent.
   with resume.pdf attached — review queue is Gmail itself.
 - G4: Preserve every non-email lead (DM/link) with full extracted data as v2
   candidates.
+- G5: Operable conversationally from Claude Code via SKILL.md skills — "find
+  new posts", "process and show me the drafts", "why was this one rejected" —
+  with the deterministic pipeline underneath, not replaced.
 
 ## 3. Non-goals (v1)
 
@@ -51,6 +56,7 @@ Single user, the job seeker.
 | F9 | Per-post failure isolation (`status=error`, batch continues); hard-fail on auth errors | P0 |
 | F10 | `--dry-run` for process; per-run structured logs; status CLI | P1 |
 | F11 | All tunables in `config/`, no magic numbers | P1 |
+| F12 | Skills layer (`skills/*/SKILL.md`, agentskills.io style) wrapping the pipeline: discover, process, review, status/explain, tune-rules — every publish-adjacent action still human-gated | P0 |
 
 ## 6. Non-functional requirements
 
