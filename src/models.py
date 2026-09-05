@@ -67,3 +67,42 @@ class DraftResult:
     subject: str
     body: str
     flagged_terms: list[str] = field(default_factory=list)  # possible off-resume claims
+
+
+@dataclass
+class DiscoverResult:
+    """Outcome of one discover pass — what the skill layer narrates to the user.
+
+    `stop_reason` matters more than the count: a run that stopped because
+    LinkedIn showed an interstitial is a safety event, not a small harvest.
+    """
+
+    stored: int
+    cap: int
+    searches_run: int
+    searches_total: int
+    stop_reason: str  # see STOP_REASONS
+    stop_detail: str
+    duration_seconds: float
+    warning_recorded: bool = False
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+# Benign stops — the pass did its job and ended on a limit we set.
+STOP_CAP_REACHED = "cap_reached"
+STOP_WINDOW_ELAPSED = "window_elapsed"
+STOP_SEARCHES_EXHAUSTED = "searches_exhausted"
+STOP_USER_INTERRUPT = "user_interrupt"
+# Attention stops — something about LinkedIn or our selectors needs a human.
+STOP_RATE_LIMIT = "rate_limit_warning"
+STOP_LOGIN_WALL = "login_wall"
+STOP_SELECTOR_DRIFT = "selector_drift"
+STOP_NO_RESULTS = "no_results"
+
+BENIGN_STOPS = frozenset(
+    {STOP_CAP_REACHED, STOP_WINDOW_ELAPSED, STOP_SEARCHES_EXHAUSTED, STOP_USER_INTERRUPT}
+)
+# Stops that count as a LinkedIn warning under PRD §8 and trip the guardrail.
+WARNING_STOPS = frozenset({STOP_RATE_LIMIT, STOP_LOGIN_WALL})

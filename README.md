@@ -82,13 +82,41 @@ the generated script away and update `selectors.py` only.
 ## Running
 
 ```bash
+python run.py preflight                # verify setup before a run
 python run.py discover                 # one paced, capped, headed pass
 python run.py process --dry-run        # extract → qualify → draft (printed, no Gmail)
 python run.py process                  # same, but real drafts land in Gmail Drafts
 python run.py status                   # post counts by pipeline status
+python run.py guardrail                # account-safety state
 ```
 
 Useful flags: `discover --cap 10`, `process --stage extract --stage qualify`.
+Every subcommand takes `--json` for machine-readable output — that is how the
+skills layer reads results.
+
+### Talking to it instead
+
+`skills/` holds SKILL.md skills that Claude Code discovers automatically, so
+the pipeline can be driven conversationally ("find fresh hiring posts") rather
+than by remembering flags. The skills call this same CLI; nothing is bypassed.
+
+### Account guardrail
+
+The PRD's stop conditions are enforced in code, not left to memory. One
+LinkedIn warning pauses discovery for 48h and halves the recommended cap; a
+second stops it until a person reviews pacing. State lives in
+`data/guardrail.json`. Clear it deliberately, after actually changing
+something:
+
+```bash
+python run.py guardrail --clear "lengthened delays, halved cap"
+```
+
+### Tests
+
+```bash
+python -m pytest tests/ -q
+```
 
 Everything tunable (caps, delays, run window, models) lives in
 `config/settings.json`. Logs land in `logs/`, one file per run. The DB is
