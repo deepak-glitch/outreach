@@ -15,6 +15,7 @@ from __future__ import annotations
 import logging
 import random
 import time
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from urllib.parse import quote
 
@@ -47,6 +48,26 @@ SEARCH_URL = (
     "https://www.linkedin.com/search/results/content/"
     "?keywords={keywords}&datePosted=%22past-24h%22&sortBy=%22date_posted%22"
 )
+
+
+@dataclass(frozen=True)
+class DiscoverEnv:
+    """Where discovery runs.
+
+    Defaults are production. The offline harness overrides them to drive this
+    exact code against a local fixture page, so the capture loop can be proven
+    without touching LinkedIn or waiting on a supervised pass.
+
+    `headless` defaults to False and production never changes it: discovery is
+    watched by a person, and a headless run on the real site would defeat the
+    whole safety design.
+    """
+
+    search_url: str = SEARCH_URL
+    userdata_dir: str = USERDATA_DIR
+    headless: bool = False
+    executable_path: str | None = None
+    browser_args: tuple[str, ...] = ()
 
 
 class StopRun(Exception):
@@ -126,8 +147,14 @@ def _capture_card(card: Locator) -> RawPost | None:
     )
 
 
-def run_discover(store: Store, keywords: list[str], settings: dict) -> DiscoverResult:
+def run_discover(
+    store: Store,
+    keywords: list[str],
+    settings: dict,
+    env: DiscoverEnv | None = None,
+) -> DiscoverResult:
     """One bounded pass over the configured searches."""
+    env = env or DiscoverEnv()
     caps = settings["discover"]
     cap = caps["max_posts_per_run"]
     window_s = caps["max_run_minutes"] * 60
@@ -140,7 +167,12 @@ def run_discover(store: Store, keywords: list[str], settings: dict) -> DiscoverR
     stop_detail = "worked through every configured search"
 
     with sync_playwright() as pw:
-        context = pw.chromium.launch_persistent_context(USERDATA_DIR, headless=False)
+        context = pw.chromium.launch_persistent_context(
+            env.userdata_dir,
+            headless=env.headless,
+            executable_path=env.executable_path,
+            args=list(env.browser_args),
+        )
         page = context.pages[0] if context.pages else context.new_page()
         try:
             for search in keywords:
@@ -153,7 +185,7 @@ def run_discover(store: Store, keywords: list[str], settings: dict) -> DiscoverR
                     break
                 logger.info("search: %r", search)
                 searches_run += 1
-                page.goto(SEARCH_URL.format(keywords=quote(search)))
+                page.goto(env.search_url.format(keywords=quote(search)))
                 page.wait_for_load_state("domcontentloaded")
                 _human_pause(delays)
                 _check_interstitials(page)

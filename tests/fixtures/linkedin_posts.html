@@ -1,0 +1,101 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Posts search fixture</title>
+<style>body{font:14px system-ui;margin:0;padding:16px} .feed-shared-update-v2{border:1px solid #ccc;padding:12px;margin-bottom:600px}</style>
+<!--
+  Offline stand-in for LinkedIn's Posts search results.
+
+  Its only job is to reproduce the DOM shapes src/discover/selectors.py targets,
+  including the ones that trip naive scrapers: a card carrying the urn on itself
+  vs. on a descendant, truncated text behind a "see more" button, a card with no
+  urn at all, a repeated urn, and an empty card. Post text is invented.
+-->
+<div id="results"></div>
+<script>
+const POSTS = [
+  { urn: "urn:li:activity:7100000000000000001", urnOnCard: true,
+    name: "Priya Raman", headline: "Talent Partner at Northwind AI",
+    text: "We're hiring an AI Engineer (remote, US). 3+ yrs Python, LLM eval pipelines. Send a CV to priya [at] northwind dot ai",
+    truncated: false },
+  { urn: "urn:li:activity:7100000000000000002", urnOnCard: false,
+    name: "Marcus Bell", headline: "Engineering Manager, Fernway Labs",
+    text: "Fernway is looking for a Machine Learning Engineer to own our retrieval stack. Full-time, hybrid Austin. No sponsorship available for this role.",
+    truncated: true },
+  { urn: "urn:li:activity:7100000000000000003", urnOnCard: true,
+    name: "Dana Okoye", headline: "Founder @ Halcyon",
+    text: "Shipping our v2 today. Enormously proud of this team.",
+    truncated: false },
+  { urn: null, urnOnCard: false,
+    name: "Unknown Poster", headline: "Recruiter",
+    text: "Hiring backend engineers, DM me for details.", truncated: false },
+  { urn: "urn:li:activity:7100000000000000001", urnOnCard: true,
+    name: "Priya Raman", headline: "Talent Partner at Northwind AI",
+    text: "We're hiring an AI Engineer (remote, US). 3+ yrs Python, LLM eval pipelines. Send a CV to priya [at] northwind dot ai",
+    truncated: false },
+  { urn: "urn:li:activity:7100000000000000005", urnOnCard: true,
+    name: "Empty Card", headline: "n/a", text: "", truncated: false },
+];
+const PAGE2 = [
+  { urn: "urn:li:activity:7100000000000000006", urnOnCard: false,
+    name: "Sofia Lindqvist", headline: "Technical Recruiter, Grove Systems",
+    text: "Grove Systems needs an LLM Applications Engineer. Contract to hire. Email careers@grovesystems.example with 'LLM' in the subject.",
+    truncated: true },
+  { urn: "urn:li:activity:7100000000000000007", urnOnCard: true,
+    name: "Tom Iverson", headline: "Head of AI, Bellcurve",
+    text: "Two openings on my team for AI engineers. Apply here: https://bellcurve.example/jobs",
+    truncated: false },
+];
+
+function render(post) {
+  const card = document.createElement("div");
+  card.className = "feed-shared-update-v2";
+  if (post.urn && post.urnOnCard) card.setAttribute("data-urn", post.urn);
+
+  const actor = document.createElement("div");
+  actor.className = "update-components-actor";
+  // The visible name sits in an aria-hidden span beside a screen-reader copy.
+  actor.innerHTML =
+    '<span class="update-components-actor__title">' +
+      '<span aria-hidden="true">' + post.name + '</span>' +
+      '<span class="visually-hidden">View ' + post.name + "'s profile</span>" +
+    '</span>' +
+    '<span class="update-components-actor__description">' + post.headline + '</span>';
+  card.appendChild(actor);
+
+  // Some cards carry the urn on a descendant wrapper instead of the card itself.
+  const body = document.createElement("div");
+  if (post.urn && !post.urnOnCard) body.setAttribute("data-urn", post.urn);
+
+  const textEl = document.createElement("div");
+  textEl.className = "update-components-text";
+  if (post.truncated) {
+    const shown = post.text.slice(0, 60);
+    textEl.innerHTML = '<span class="break-words">' + shown + '…</span>';
+    const btn = document.createElement("button");
+    btn.className = "feed-shared-inline-show-more-text__see-more-less-toggle";
+    btn.textContent = "…more";
+    btn.addEventListener("click", () => {
+      textEl.querySelector(".break-words").textContent = post.text;
+      btn.remove();
+    });
+    body.appendChild(textEl);
+    body.appendChild(btn);
+  } else {
+    textEl.innerHTML = '<span class="break-words">' + post.text + '</span>';
+    body.appendChild(textEl);
+  }
+  card.appendChild(body);
+  return card;
+}
+
+const results = document.getElementById("results");
+POSTS.forEach(p => results.appendChild(render(p)));
+
+// A second page arrives on scroll, the way the real feed lazy-loads.
+let loaded = false;
+window.addEventListener("scroll", () => {
+  if (loaded || window.scrollY < 400) return;
+  loaded = true;
+  PAGE2.forEach(p => results.appendChild(render(p)));
+});
+</script>
