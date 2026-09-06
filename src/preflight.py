@@ -19,6 +19,7 @@ because discovery is unaffected, yet it still blocks `process`.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -158,11 +159,17 @@ def _check_browser() -> list[Check]:
         )
         return checks
 
-    # Chromium lives in a per-user cache; playwright only tells us at launch,
-    # so probe the usual locations rather than launching a browser to find out.
-    candidates = list(Path.home().glob(".cache/ms-playwright/chromium*")) + list(
-        Path.home().glob("Library/Caches/ms-playwright/chromium*")
-    )
+    # Chromium lives in a browser cache whose location playwright only resolves
+    # at launch. Probe rather than launching a browser to find out — and honour
+    # PLAYWRIGHT_BROWSERS_PATH first, since managed and containerised setups
+    # relocate the cache and would otherwise look like a missing install.
+    roots = []
+    if os.environ.get("PLAYWRIGHT_BROWSERS_PATH"):
+        roots.append(Path(os.environ["PLAYWRIGHT_BROWSERS_PATH"]))
+    roots += [Path.home() / ".cache/ms-playwright",
+              Path.home() / "Library/Caches/ms-playwright",
+              Path.home() / "AppData/Local/ms-playwright"]
+    candidates = [c for root in roots for c in root.glob("chromium*")]
     if candidates or shutil.which("chromium") or shutil.which("chromium-browser"):
         checks.append(Check("chromium", PASS, "browser binary found"))
     else:

@@ -143,3 +143,18 @@ def test_browser_check_reports_missing_playwright(monkeypatch):
     assert checks[0].status == FAIL
     assert "discover" in checks[0].blocks
     assert "pip install" in checks[0].fix
+
+
+def test_browser_check_honours_playwright_browsers_path(tmp_path, monkeypatch):
+    """Containerised and managed setups relocate the browser cache. Reporting a
+    present chromium as missing would block discovery for no reason."""
+    import src.preflight as pf
+
+    relocated = tmp_path / "pw-browsers"
+    (relocated / "chromium-1194").mkdir(parents=True)
+    monkeypatch.setenv("PLAYWRIGHT_BROWSERS_PATH", str(relocated))
+    monkeypatch.setattr(pf.Path, "home", classmethod(lambda cls: tmp_path / "nonexistent-home"))
+    monkeypatch.setattr(pf.shutil, "which", lambda _: None)
+
+    chromium = [c for c in pf._check_browser() if c.name == "chromium"][0]
+    assert chromium.status == PASS, chromium.detail
